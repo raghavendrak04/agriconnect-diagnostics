@@ -100,13 +100,16 @@ def get_info_by_class_name(class_name):
             item.get('Variety_Title', '')
         ]
         
+        # Filter out empty strings to avoid false positives
+        valid_candidates = [c for c in candidates if c and c.strip()]
+        
         # 1. Exact match (case insensitive)
-        if any(c.lower() == search_term for c in candidates):
+        if any(c.lower() == search_term for c in valid_candidates):
             return item
             
         # 2. Check if class_name is IN the candidate (e.g. 'Calypso' in 'Mango___Calypso')
         # OR if candidate is IN the class_name
-        if any(search_term in c.lower() for c in candidates) or any(c.lower() in search_term for c in candidates):
+        if any(search_term in c.lower() for c in valid_candidates) or any(c.lower() in search_term for c in valid_candidates):
             return item
             
     return None
@@ -240,12 +243,12 @@ def render_details(data):
 
 def main():
     st.markdown("<h1 style='text-align: center;'>Agriconnect 🌱</h1>", unsafe_allow_html=True)
-    st.title(" Pomegranate & Mango Diagnostics")
-    st.write("Upload an image to identify the growth stage, disease, or variety.")
+    st.markdown("<h2 style='text-align: center;'>Pomegranate & Mango Diagnostics</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>Upload an image to identify the growth stage, disease, or variety.</p>", unsafe_allow_html=True)
 
     # Sidebar for Model Info
     st.sidebar.header("Model Configuration")
-    st.sidebar.info("Comparing Keras (.h5) and PyTorch (.pth) models.")
+    st.sidebar.info("Comparing MobileNet (Lighter) and EfficientNet (Heavier ) models.")
 
     # Load Models
     model_keras = load_keras_model(KERAS_MODEL_PATH)
@@ -253,6 +256,24 @@ def main():
 
     if model_keras and model_pytorch:
         st.sidebar.success("Models Loaded Successfully!")
+
+    # --- Sidebar: Contact Info ---
+    st.sidebar.markdown("---")
+    st.sidebar.header("📬 Contact & Source")
+    
+    st.sidebar.markdown(
+        """
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="https://www.linkedin.com/in/kurapati-raghavendra-39b3951b0/" target="_blank" style="text-decoration: none;">
+                <img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" style="width: 100%; border-radius: 5px;">
+            </a>
+            <a href="https://github.com/raghavendrak04/agriconnect-diagnostics" target="_blank" style="text-decoration: none;">
+                <img src="https://img.shields.io/badge/GitHub-Source_Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" style="width: 100%; border-radius: 5px;">
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # File Uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -302,24 +323,24 @@ def main():
                 with res_col1:
                     st.markdown(f"""
                     <div class="prediction-card" style="text-align: center; border-top: 5px solid #2196F3;">
-                        <h3 style="color: #2196F3; margin-bottom: 0;">Best Model (Keras)</h3>
-                        <p style="font-size: 0.9em; color: #666;">High Accuracy</p>
+                        <h3 style="color: #2196F3; margin-bottom: 0;">MobileNet (Lighter)</h3>  
+                        <p style="font-size: 0.9em; color: #666;">Fast Inference</p>
                         <hr>
                         <h2 class="prediction-value" style="font-size: 1.8em; margin: 10px 0;">{name_keras}</h2>
                         <p><strong>Confidence:</strong> {conf_keras:.1%}</p>
-                        <p style="font-size: 0.8em; color: #999;">Inference: {time_keras:.1f} ms</p>
+                        <p style="font-size: 0.8em; color: #999;">Time: {time_keras:.1f} ms</p>
                     </div>
                     """, unsafe_allow_html=True)
 
                 with res_col2:
                         st.markdown(f"""
                     <div class="prediction-card" style="text-align: center; border-top: 5px solid #E91E63;">
-                        <h3 style="color: #E91E63; margin-bottom: 0;">EfficientNet (PyTorch)</h3>
-                        <p style="font-size: 0.9em; color: #666;">Robust Verification</p>
+                        <h3 style="color: #E91E63; margin-bottom: 0;">EfficientNet (Heavier)</h3>  
+                        <p style="font-size: 0.9em; color: #666;">High Accuracy</p>
                         <hr>
                         <h2 class="prediction-value" style="font-size: 1.8em; margin: 10px 0;">{name_pytorch}</h2>
                         <p><strong>Confidence:</strong> {conf_pytorch:.1%}</p>
-                        <p style="font-size: 0.8em; color: #999;">Inference: {time_pytorch:.1f} ms</p>
+                        <p style="font-size: 0.8em; color: #999;">Time: {time_pytorch:.1f} ms</p>
                     </div>
                     """, unsafe_allow_html=True)
 
@@ -332,7 +353,7 @@ def main():
                     render_details(res_pytorch)
                 else:
                     st.warning("⚠️ **Model Disagreement:** The models have different predictions.")
-                    tab1, tab2 = st.tabs([f"Keras: {name_keras} (Best)", f"PyTorch: {name_pytorch}"])
+                    tab1, tab2 = st.tabs([f"Lighter: {name_keras} ", f"Heavier: {name_pytorch}"])
                     
                     with tab1:
                         render_details(res_keras)
