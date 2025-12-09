@@ -258,22 +258,22 @@ def main():
         st.sidebar.success("Models Loaded Successfully!")
 
     # --- Sidebar: Contact Info ---
-    st.sidebar.markdown("---")
-    st.sidebar.header("📬 Contact & Source")
+    # st.sidebar.markdown("---")
+    # st.sidebar.header("📬 Contact & Source")
     
-    st.sidebar.markdown(
-        """
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <a href="https://www.linkedin.com/in/kurapati-raghavendra-39b3951b0/" target="_blank" style="text-decoration: none;">
-                <img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" style="width: 100%; border-radius: 5px;">
-            </a>
-            <a href="https://github.com/raghavendrak04/agriconnect-diagnostics" target="_blank" style="text-decoration: none;">
-                <img src="https://img.shields.io/badge/GitHub-Source_Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" style="width: 100%; border-radius: 5px;">
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # st.sidebar.markdown(
+    #     """
+    #     <div style="display: flex; flex-direction: column; gap: 10px;">
+    #         <a href="https://www.linkedin.com/in/kurapati-raghavendra-39b3951b0/" target="_blank" style="text-decoration: none;">
+    #             <img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" style="width: 100%; border-radius: 5px;">
+    #         </a>
+    #         <a href="https://github.com/raghavendrak04/agriconnect-diagnostics" target="_blank" style="text-decoration: none;">
+    #             <img src="https://img.shields.io/badge/GitHub-Source_Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" style="width: 100%; border-radius: 5px;">
+    #         </a>
+    #     </div>
+    #     """,
+    #     unsafe_allow_html=True
+    # )
 
     # File Uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
