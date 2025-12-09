@@ -246,6 +246,22 @@ def main():
     st.markdown("<h2 style='text-align: center;'>Pomegranate & Mango Diagnostics</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Upload an image to identify the growth stage, disease, or variety.</p>", unsafe_allow_html=True)
 
+    with st.expander("ℹ️ About Project & Capabilities"):
+        st.markdown("""
+        **🔍 Project Goal:**
+        AI-powered diagnostic tool to assist in monitoring Pomegranate and Mango crops.
+        
+        **🧠 Models Used:**
+        *   **MobileNet (Lighter)**: Optimized for space and speed.
+        *   **EfficientNet (Heavier)**: Optimized for high accuracy.
+        
+        **🎯 12 Detectable Classes:**
+        *   **Pomegranate_Diseases**: Alternaria, Anthracnose, Bacterial Blight, Cercospora.
+        *   **Pomegranate_Growth_Stages**: Bud, Flower, Early Fruit, Mid-Growth, Ripe.
+        *   **Mango_Varieties**: Kesar, Calypso.
+        *   **Pomegranate_Status**: Healthy.
+        """)
+
     # Sidebar for Model Info
     st.sidebar.header("Model Configuration")
     st.sidebar.info("Comparing MobileNet (Lighter) and EfficientNet (Heavier ) models.")
