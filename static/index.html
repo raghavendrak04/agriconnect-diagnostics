@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agriconnect — Empowering Farmers with Technology</title>
+    <meta name="description"
+        content="Agriconnect is a farmer-first platform combining AI crop diagnostics, community, automation tools, and education for modern agriculture." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --g1: #064e3b;
+            --g2: #059669;
+            --g3: #10b981;
+            --g4: #6ee7b7;
+            --g5: #d1fae5;
+            --b1: #1e3a8a;
+            --b2: #2563eb;
+            --b3: #3b82f6;
+            --p1: #7c3aed;
+            --p2: #a78bfa;
+            --bg: #fafbfc;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --light: #f3f4f6;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ─────────────────────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+
+        .nav-inner {
+            max-width: 1140px;
+            margin: 0 auto;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--g2), var(--b3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-logo-text {
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--text);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link {
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+            background: var(--light);
+        }
+
+        .nav-cta {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--g2), var(--b3));
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        }
+
+        @media(max-width:640px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* ── HERO ────────────────────────────────────────────────── */
+        .hero {
+            padding: 120px 24px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #f0fdf4 0%, var(--bg) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--g5);
+            border: 1px solid var(--g4);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--g1);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+            font-weight: 900;
+            line-height: 1.08;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--g1) 0%, var(--b1) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 36px;
+            line-height: 1.65;
+        }
+
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--g2), var(--b2));
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(5, 150, 105, 0.35);
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--g3);
+            color: var(--g2);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            margin-top: 56px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .h-stat-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--g2);
+        }
+
+        .h-stat-lbl {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ── SECTION SHARED ──────────────────────────────────────── */
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--g5);
+            color: var(--g1);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .section-sub {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 520px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        /* ── VISION ──────────────────────────────────────────────── */
+        .vision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        @media(max-width:768px) {
+            .vision-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .vision-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 14px;
+            margin-bottom: 14px;
+            transition: transform 0.2s;
+        }
+
+        .vision-card:hover {
+            transform: translateX(6px);
+        }
+
+        .vision-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .vision-icon.green {
+            background: var(--g5);
+        }
+
+        .vision-icon.blue {
+            background: #dbeafe;
+        }
+
+        .vision-icon.purple {
+            background: #ede9fe;
+        }
+
+        .vision-icon.orange {
+            background: #fef3c7;
+        }
+
+        .vision-card h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .vision-card p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ── PRODUCTS ─────────────────────────────────────────────── */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media(max-width:860px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:540px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card.live {
+            border-bottom: 4px solid var(--g3);
+        }
+
+        .product-card.upcoming {
+            border-bottom: 4px solid var(--border);
+        }
+
+        .product-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+            margin-bottom: 16px;
+        }
+
+        .status-live {
+            background: var(--g5);
+            color: var(--g1);
+        }
+
+        .status-upcoming {
+            background: var(--light);
+            color: var(--muted);
+        }
+
+        .product-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .product-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .product-card>p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .product-card .product-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--g2);
+            text-decoration: none;
+            transition: gap 0.2s;
+        }
+
+        .product-card .product-link:hover {
+            gap: 10px;
+        }
+
+        .product-card .product-link.disabled {
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        /* ── MARKET FIT ───────────────────────────────────────────── */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media(max-width:640px) {
+            .market-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .market-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .market-card h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .market-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .market-card li {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.7;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .market-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--g3);
+            font-weight: 700;
+        }
+
+        /* ── CONTACT ──────────────────────────────────────────────── */
+        .contact-section {
+            background: linear-gradient(135deg, var(--g1) 0%, var(--b1) 100%);
+            padding: 72px 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .contact-section h2 {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .contact-section p {
+            font-size: 1rem;
+            opacity: 0.8;
+            max-width: 500px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+
+        .btn-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: var(--g1);
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ── FOOTER ───────────────────────────────────────────────── */
+        footer {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .footer-sub {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+        }
+
+        .footer-link {
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--g2);
+        }
+
+        /* ── ANIMATIONS ───────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .anim {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .anim.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <div class="nav-logo-icon">🌱</div>
+                <span class="nav-logo-text">Agriconnect</span>
+            </a>
+            <div class="nav-links">
+                <a href="#vision" class="nav-link">Vision</a>
+                <a href="#products" class="nav-link">Products</a>
+                <a href="#market" class="nav-link">Market Fit</a>
+                <a href="mailto:veeraraghavendra.k22@iiits.in" class="nav-cta">✉ Contact Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-eyebrow">🚀 Farmer-First Tech Platform</div>
+        <h1>Technology That<br>Grows With Farmers</h1>
+        <p class="hero-sub">Agriconnect is building the future of farming — combining AI crop diagnostics, farmer
+            communities, smart automation, and education tools in one platform.</p>
+        <div class="hero-btns">
+            <a href="/diagnostics" class="btn-primary">🔬 Try Crop Diagnostics</a>
+            <a href="mailto:veeraraghavendra.k22@iiits.in" class="btn-outline">✉ Contact Us</a>
+        </div>
+        <div class="hero-stats">
+            <div>
+                <div class="h-stat-val">12</div>
+                <div class="h-stat-lbl">Disease Classes</div>
+            </div>
+            <div>
+                <div class="h-stat-val">2</div>
+                <div class="h-stat-lbl">AI Models</div>
+            </div>
+            <div>
+                <div class="h-stat-val">85%+</div>
+                <div class="h-stat-lbl">Accuracy</div>
+            </div>
+            <div>
+                <div class="h-stat-val">B2C</div>
+                <div class="h-stat-lbl">Trend Focus</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISION -->
+    <section class="section" id="vision">
+        <div class="container">
+            <div class="vision-grid">
+                <div>
+                    <div class="section-badge">🌿 Our Vision</div>
+                    <h2 class="section-title">A Platform Where Farmers<br>Connect, Learn & Grow</h2>
+                    <p class="section-sub">We understand the pain points of modern agriculture — from social media
+                        growth for agri-communities to privacy, automation, and analysis tools. Agriconnect bridges the
+                        gap between technology and the field.</p>
+                </div>
+                <div>
+                    <div class="vision-card anim">
+                        <div class="vision-icon green">🤝</div>
+                        <div>
+                            <h4>Farmer-to-Farmer Community</h4>
+                            <p>A social platform where farmers communicate, share trends, and build tech-powered farming
+                                communities.</p>
+                        </div>
+                    </div>
+                    <div class="vision-card anim">
+                        <div class="vision-icon blue">🧠</div>
+                        <div>
+                            <h4>AI Crop Detection & Recommendations</h4>
+                            <p>Upload a photo, get instant disease diagnosis with organic and chemical treatment plans.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="vision-card anim">
+                        <div class="vision-icon purple">⚙️</div>
+                        <div>
+                            <h4>Automation & Monitoring</h4>
+                            <p>Crop monitoring, smart irrigation, weather-based alerts — bringing IoT to the farm.</p>
+                        </div>
+                    </div>
+                    <div class="vision-card anim">
+                        <div class="vision-icon orange">📚</div>
+                        <div>
+                            <h4>Education & Training</h4>
+                            <p>Tools for learning modern farming techniques, pest management, and best agricultural
+                                practices.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="section" id="products" style="background:#f9fafb;">
+        <div class="container">
+            <div style="text-align:center;margin-bottom:48px;">
+                <div class="section-badge">📦 Our Products</div>
+                <h2 class="section-title">Platform Products</h2>
+                <p class="section-sub" style="margin-left:auto;margin-right:auto;">Explore what's live and what's coming
+                    next to revolutionize agriculture.</p>
+            </div>
+            <div class="products-grid">
+
+                <!-- LIVE: Diagnostics -->
+                <div class="product-card live anim">
+                    <div class="product-status status-live">● Live</div>
+                    <div class="product-icon" style="background:var(--g5);">🔬</div>
+                    <h3>Crop Diagnostics</h3>
+                    <p>Dual AI engine (MobileNet V2 + EfficientNet B4) detects 12 disease classes in Pomegranate & Mango
+                        with 85%+ accuracy. Includes treatment plans and AI chat assistant.</p>
+                    <a href="/diagnostics" class="product-link">Try it now →</a>
+                </div>
+
+                <!-- UPCOMING: Social Community -->
+                <div class="product-card upcoming anim">
+                    <div class="product-status status-upcoming">◯ Coming Soon</div>
+                    <div class="product-icon" style="background:#dbeafe;">👥</div>
+                    <h3>Farmer Social Network</h3>
+                    <p>A community-first social platform — like Instagram for farmers. Share crop updates, connect with
+                        local farmers, and follow agricultural trends.</p>
+                    <span class="product-link disabled">Coming Soon →</span>
+                </div>
+
+                <!-- UPCOMING: Monitoring -->
+                <div class="product-card upcoming anim">
+                    <div class="product-status status-upcoming">◯ Coming Soon</div>
+                    <div class="product-icon" style="background:#fef3c7;">📡</div>
+                    <h3>Crop Monitoring & Alerts</h3>
+                    <p>Real-time crop health tracking, weather-based alerts, and smart irrigation automation powered by
+                        IoT sensors and camera systems.</p>
+                    <span class="product-link disabled">Coming Soon →</span>
+                </div>
+
+                <!-- UPCOMING: Hardware -->
+                <div class="product-card upcoming anim">
+                    <div class="product-status status-upcoming">◯ Coming Soon</div>
+                    <div class="product-icon" style="background:#fce7f3;">📷</div>
+                    <h3>Hardware Products</h3>
+                    <p>Affordable sensor kits and smart cameras designed specifically for farm use — plug-and-play crop
+                        monitoring hardware.</p>
+                    <span class="product-link disabled">Coming Soon →</span>
+                </div>
+
+                <!-- UPCOMING: Education -->
+                <div class="product-card upcoming anim">
+                    <div class="product-status status-upcoming">◯ Coming Soon</div>
+                    <div class="product-icon" style="background:#ede9fe;">🎓</div>
+                    <h3>Education Tools</h3>
+                    <p>Interactive learning modules on pest management, soil health, modern techniques, and government
+                        schemes — available in local languages.</p>
+                    <span class="product-link disabled">Coming Soon →</span>
+                </div>
+
+                <!-- UPCOMING: Recommending System -->
+                <div class="product-card upcoming anim">
+                    <div class="product-status status-upcoming">◯ Coming Soon</div>
+                    <div class="product-icon" style="background:#e0f2fe;">🎯</div>
+                    <h3>Smart Recommendations</h3>
+                    <p>AI-powered crop suggestions based on soil type, weather patterns, market demand, and historical
+                        yield data for your region.</p>
+                    <span class="product-link disabled">Coming Soon →</span>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- MARKET FIT -->
+    <section class="section" id="market">
+        <div class="container">
+            <div style="text-align:center;margin-bottom:48px;">
+                <div class="section-badge">📊 Market Fit</div>
+                <h2 class="section-title">Why Agriconnect?</h2>
+                <p class="section-sub" style="margin-left:auto;margin-right:auto;">We're building at the intersection of
+                    agriculture and technology — where the demand is growing fast.</p>
+            </div>
+            <div class="market-grid">
+                <div class="market-card anim">
+                    <h4>🎯 Founder-Market Fit</h4>
+                    <ul>
+                        <li>Deep understanding of farmer pain points</li>
+                        <li>Social media growth for agri-communities</li>
+                        <li>Privacy-first approach to farmer data</li>
+                        <li>Automation and analysis tools expertise</li>
+                    </ul>
+                </div>
+                <div class="market-card anim">
+                    <h4>💡 The Solution</h4>
+                    <ul>
+                        <li>Platform where Farmers connect with Farmers</li>
+                        <li>Tech products built for agricultural use</li>
+                        <li>Social media tailored for farming communities</li>
+                        <li>AI-powered detection & recommendation engine</li>
+                    </ul>
+                </div>
+                <div class="market-card anim">
+                    <h4>📈 B2C Trend Changes</h4>
+                    <ul>
+                        <li>Growing demand for crop monitoring automation</li>
+                        <li>Smart irrigation & weather-based alerts</li>
+                        <li>Affordable hardware (sensors, cameras)</li>
+                        <li>Digital education & training tools</li>
+                    </ul>
+                </div>
+                <div class="market-card anim">
+                    <h4>🔍 Competitive Landscape</h4>
+                    <ul>
+                        <li><strong>Proxy:</strong> Intragram — Community + Tech</li>
+                        <li>Social media meets agricultural software</li>
+                        <li>No major player combining all verticals</li>
+                        <li>First-mover advantage in integrated agri-tech</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact-section" id="contact">
+        <h2>Let's Build the Future of Farming</h2>
+        <p>We're actively looking for collaborators, investors, and early adopters. Reach out and let's talk.</p>
+        <a href="mailto:veeraraghavendra.k22@iiits.in" class="btn-contact">✉ veeraraghavendra.k22@iiits.in</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">🌱 Agriconnect</div>
+            <div class="footer-sub">Empowering Farmers with Technology</div>
+            <div class="footer-links">
+                <a href="#vision" class="footer-link">Vision</a>
+                <a href="#products" class="footer-link">Products</a>
+                <a href="#market" class="footer-link">Market Fit</a>
+                <a href="mailto:veeraraghavendra.k22@iiits.in" class="footer-link">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animation observer
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.anim').forEach(el => obs.observe(el));
+    </script>
+</body>
+
+</html>
