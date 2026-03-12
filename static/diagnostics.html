@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Diagnostics — Agriconnect</title>
+    <meta name="description"
+        content="Upload a Pomegranate or Mango crop image and get instant AI-powered disease diagnosis with treatment plans." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green: #10b981;
+            --green2: #059669;
+            --blue: #3b82f6;
+            --blue2: #2563eb;
+            --purple: #8b5cf6;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+            --light: #f1f5f9;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* NAV */
+        nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 0;
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-logo-text {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text);
+        }
+
+        .nav-pills {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-pill {
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: var(--light);
+            color: var(--muted);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-pill.active,
+        .nav-pill:hover {
+            background: var(--green);
+            color: white;
+            border-color: var(--green);
+        }
+
+        .model-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .model-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background 0.4s;
+        }
+
+        .model-dot.ready {
+            background: var(--green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .model-dot.loading {
+            background: var(--orange);
+            animation: pulse 1.2s infinite;
+        }
+
+        .model-dot.error {
+            background: var(--red);
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #1d4ed8 100%);
+            color: white;
+            padding: 56px 0 44px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            color: #6ee7b7;
+        }
+
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.85;
+            max-width: 520px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hero-tag {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        /* STATS */
+        .stats-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 18px 0;
+        }
+
+        .stats-inner {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* CARDS */
+        .features {
+            padding: 40px 0 0;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-sub {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 24px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media(max-width:720px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            transition: transform 0.25s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+
+        .card-icon.green {
+            background: #d1fae5;
+        }
+
+        .card-icon.blue {
+            background: #dbeafe;
+        }
+
+        .card-icon.purple {
+            background: #ede9fe;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* UPLOAD */
+        .upload-section {
+            padding: 36px 0;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            background: white;
+            padding: 44px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--green);
+            background: #f0fdf4;
+        }
+
+        .upload-zone input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #d1fae5, #dbeafe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 14px;
+        }
+
+        .upload-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .upload-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* PREVIEW */
+        .preview-section {
+            display: none;
+            padding: 28px 0;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .preview-section.visible {
+            display: block;
+        }
+
+        .preview-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            display: flex;
+            gap: 22px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .preview-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .preview-info {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .preview-info h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .preview-info p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--light);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 10px;
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+        }
+
+        /* RESULTS */
+        .results-section {
+            display: none;
+            padding: 28px 0;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .results-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .consensus-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .consensus-badge.agree {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .consensus-badge.disagree {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .model-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media(max-width:600px) {
+            .model-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .model-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .model-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .model-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .model-badge-pill {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .model-badge-pill.speed {
+            background: #dbeafe;
+            color: var(--blue2);
+        }
+
+        .model-badge-pill.accuracy {
+            background: #d1fae5;
+            color: var(--green2);
+        }
+
+        .model-result {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .conf-bar-wrap {
+            background: var(--light);
+            border-radius: 50px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .conf-bar {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .conf-bar.blue {
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+        }
+
+        .conf-bar.green {
+            background: linear-gradient(90deg, var(--green), var(--blue));
+        }
+
+        .conf-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        /* DETAILS */
+        .details-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow);
+            margin-top: 14px;
+        }
+
+        .details-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .details-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .details-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .details-category {
+            display: inline-block;
+            margin-top: 4px;
+            background: var(--light);
+            color: var(--muted);
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .details-desc {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 22px;
+            padding: 14px;
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media(max-width:600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-box {
+            border-radius: 12px;
+            padding: 14px;
+            border-left: 4px solid;
+        }
+
+        .info-box.blue {
+            background: #eff6ff;
+            border-color: var(--blue);
+        }
+
+        .info-box.green {
+            background: #f0fdf4;
+            border-color: var(--green);
+        }
+
+        .info-box.orange {
+            background: #fffbeb;
+            border-color: var(--orange);
+        }
+
+        .info-box.purple {
+            background: #f5f3ff;
+            border-color: var(--purple);
+        }
+
+        .info-box h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .info-box.blue h4 {
+            color: var(--blue2);
+        }
+
+        .info-box.green h4 {
+            color: var(--green2);
+        }
+
+        .info-box.orange h4 {
+            color: #b45309;
+        }
+
+        .info-box.purple h4 {
+            color: #6d28d9;
+        }
+
+        .info-box p {
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .mgmt-tip {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #92400e;
+            line-height: 1.6;
+        }
+
+        .imgs-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .ref-img {
+            width: 92px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ref-img:hover {
+            transform: scale(1.06);
+        }
+
+        /* SPINNER */
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .spinner-overlay.visible {
+            display: flex;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--green);
+            animation: spin 0.8s linear infinite;
+        }
+
+        .spinner-text {
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* CHATBOT */
+        .chat-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        .chat-fab-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .chat-fab-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 88px;
+            right: 24px;
+            z-index: 1000;
+            width: 340px;
+            max-height: 500px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s;
+        }
+
+        .chat-window.open {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #064e3b, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .chat-header-info h4 {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .chat-header-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.72rem;
+        }
+
+        .chat-header-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chat-header-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .chat-header-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 330px;
+        }
+
+        .chat-welcome {
+            text-align: center;
+            padding: 14px 6px;
+        }
+
+        .chat-welcome-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .chat-welcome h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .chat-welcome p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .chat-chips {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 4px 6px;
+        }
+
+        .chat-chip {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .chat-chip:hover {
+            background: #f0fdf4;
+            border-color: var(--green);
+            color: var(--green2);
+        }
+
+        .msg {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .msg.user {
+            flex-direction: row-reverse;
+        }
+
+        .msg-bubble {
+            max-width: 78%;
+            padding: 9px 13px;
+            border-radius: 14px;
+            font-size: 0.84rem;
+            line-height: 1.55;
+        }
+
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg.bot .msg-bubble {
+            background: var(--light);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .msg-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 10px 14px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--muted);
+            animation: blink 1.2s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .chat-input-row {
+            padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 0.84rem;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            background: var(--light);
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--green);
+            background: white;
+        }
+
+        .chat-send {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s;
+        }
+
+        .chat-send:hover {
+            transform: scale(1.08);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--light);
+            border-radius: 12px;
+            padding: 4px;
+            width: fit-content;
+            margin-bottom: 18px;
+        }
+
+        .tab-btn {
+            padding: 7px 16px;
+            border-radius: 9px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--text);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes blink {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner"></div>
+        <div class="spinner-text" id="spinnerText">Analyzing…</div>
+    </div>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="nav-logo">
+                <div class="nav-logo-icon">🌱</div><span class="nav-logo-text">Agriconnect</span>
+            </a>
+            <div class="nav-pills">
+                <a href="/" class="nav-pill">← Home</a>
+                <button class="nav-pill active">Diagnostics</button>
+            </div>
+            <div class="model-badge">
+                <div class="model-dot" id="modelDot"></div><span id="modelStatusText">AI Models</span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-eyebrow">🤖 Dual AI • MobileNet V2 + EfficientNet B4</div>
+            <h1>Protect Your Crop<br><span>Before It's Too Late</span></h1>
+            <p class="hero-sub">Upload a leaf or fruit photo. Our dual AI detects Pomegranate &amp; Mango diseases in
+                seconds — treatment plans ready instantly.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">🍃 Pomegranate</span><span class="hero-tag">🥭 Mango</span>
+                <span class="hero-tag">⚡ Instant</span><span class="hero-tag">💊 Treatment Plans</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="container stats-inner">
+            <div class="stat">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Disease Classes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">2</div>
+                <div class="stat-label">AI Models</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">85%+</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">&lt;500ms</div>
+                <div class="stat-label">Inference</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features container">
+        <div style="padding-top:36px;">
+            <p class="section-title">Three steps to save your harvest</p>
+            <p class="section-sub">Simple, powerful under the hood.</p>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon green">📸</div>
+                    <h3>1 — Upload</h3>
+                    <p>Take a clear photo of the affected leaf or fruit and drag it into the analyzer.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon blue">🧠</div>
+                    <h3>2 — AI Analysis</h3>
+                    <p>MobileNet V2 and EfficientNet B4 analyze simultaneously and cross-verify results.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon purple">💊</div>
+                    <h3>3 — Treatment</h3>
+                    <p>Get symptoms, treatments, management tips, and AI chat for follow-up questions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="upload-section container" id="upload">
+        <p class="section-title">🔬 Image Analyzer</p>
+        <p class="section-sub">Drop a clear crop photo below.</p>
+        <div class="upload-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" />
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">Drag &amp; Drop or Click to Browse</div>
+            <div class="upload-sub">JPG, JPEG, PNG</div>
+            <div class="upload-hint">Max size: 200 MB</div>
+        </div>
+    </section>
+
+    <section class="preview-section container" id="previewSection">
+        <div class="preview-card">
+            <img id="previewImg" class="preview-img" src="" alt="Uploaded crop" />
+            <div class="preview-info">
+                <h3 id="previewFileName">—</h3>
+                <p id="previewFileSize">—</p>
+                <button class="btn-primary" id="analyzeBtn" onclick="analyzeImage()"><span>🔍</span> Analyze
+                    Image</button>
+                <button class="btn-ghost" onclick="resetAll()">✕ Remove</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-section container" id="resultsSection">
+        <div class="results-header">
+            <h2>🔍 Analysis Results</h2>
+            <div class="consensus-badge" id="consensusBadge"></div>
+        </div>
+        <div class="model-cards">
+            <div class="model-card">
+                <div class="model-card-header"><span class="model-name">MobileNet V2</span><span
+                        class="model-badge-pill speed">⚡ Speed</span></div>
+                <div class="model-result" id="kerasName">—</div>
+                <div class="conf-bar-wrap">
+                    <div class="conf-bar blue" id="kerasBar" style="width:0%"></div>
+                </div>
+                <div class="conf-label" id="kerasConf">—</div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-top:3px;" id="kerasLatency"></div>
+            </div>
+            <div class="model-card">
+                <div class="model-card-header"><span class="model-name">EfficientNet B4</span><span
+                        class="model-badge-pill accuracy">🎯 Accuracy</span></div>
+                <div class="model-result" id="torchName">—</div>
+                <div class="conf-bar-wrap">
+                    <div class="conf-bar green" id="torchBar" style="width:0%"></div>
+                </div>
+                <div class="conf-label" id="torchConf">—</div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-top:3px;" id="torchLatency"></div>
+            </div>
+        </div>
+        <div id="detailsTabs"></div>
+        <div id="detailsContent"></div>
+        <div style="padding-bottom:50px;"></div>
+    </section>
+
+    <div class="chat-fab"><button class="chat-fab-btn" id="chatFabBtn" onclick="toggleChat()" title="Ask AI">💬</button>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-avatar">🌱</div>
+                <div class="chat-header-info">
+                    <h4>Agri Assistant</h4>
+                    <p>AI farming expert</p>
+                </div>
+            </div>
+            <div class="chat-header-btns"><button class="chat-header-btn" onclick="clearChat()"
+                    title="Clear">🗑</button><button class="chat-header-btn" onclick="toggleChat()"
+                    title="Close">✕</button></div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome">
+                <div class="chat-welcome-icon">👋</div>
+                <h4>Hello, Farmer!</h4>
+                <p>Ask about crop diseases, treatments, or farming tips.</p>
+            </div>
+            <div class="chat-chips" id="chatChips">
+                <button class="chat-chip" onclick="sendSuggestion(this)">🛡️ How to treat Bacterial Blight?</button>
+                <button class="chat-chip" onclick="sendSuggestion(this)">🥭 Best Mango varieties for Gujarat?</button>
+                <button class="chat-chip" onclick="sendSuggestion(this)">💊 Organic remedies for Anthracnose</button>
+                <button class="chat-chip" onclick="sendSuggestion(this)">🍃 Pomegranate growth stages</button>
+            </div>
+        </div>
+        <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput" rows="1" placeholder="Type your question…"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+            <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const API = ''; let currentFile = null, lastResult = null, chatOpen = false;
+        function updateModelBadge(s) { const d = document.getElementById('modelDot'), t = document.getElementById('modelStatusText'); d.className = 'model-dot'; if (s === 'loaded') { d.classList.add('ready'); t.textContent = 'Models Ready'; } else if (s === 'loading') { d.classList.add('loading'); t.textContent = 'Loading…'; } else if (s.startsWith('error')) { d.classList.add('error'); t.textContent = 'Error'; } else t.textContent = 'AI Models'; }
+        async function pollModelStatus() { try { const r = await fetch(API + '/api/model-status'); const d = await r.json(); updateModelBadge(d.status); if (d.status !== 'loaded' && !d.status.startsWith('error')) setTimeout(pollModelStatus, 2000); } catch (e) { setTimeout(pollModelStatus, 3000); } }
+        async function kickLoadModels() { try { await fetch(API + '/api/load-models', { method: 'POST' }); } catch (e) { } pollModelStatus(); }
+        kickLoadModels();
+
+        const dropZone = document.getElementById('dropZone'), fileInput = document.getElementById('fileInput');
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+        function handleFile(f) { if (!f.type.match(/image\/(jpeg|jpg|png)/)) { alert('Upload JPG or PNG.'); return; } currentFile = f; const r = new FileReader(); r.onload = e => { document.getElementById('previewImg').src = e.target.result; document.getElementById('previewFileName').textContent = f.name; document.getElementById('previewFileSize').textContent = (f.size / 1024).toFixed(1) + ' KB'; document.getElementById('previewSection').classList.add('visible'); document.getElementById('resultsSection').classList.remove('visible'); document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth', block: 'center' }); }; r.readAsDataURL(f); }
+        function resetAll() { currentFile = null; lastResult = null; fileInput.value = ''; document.getElementById('previewSection').classList.remove('visible'); document.getElementById('resultsSection').classList.remove('visible'); document.getElementById('upload').scrollIntoView({ behavior: 'smooth' }); }
+
+        async function analyzeImage() { if (!currentFile) return; showSpinner('Analyzing…'); document.getElementById('analyzeBtn').disabled = true; const fd = new FormData(); fd.append('file', currentFile); try { const r = await fetch(API + '/api/analyze', { method: 'POST', body: fd }); if (r.status === 503) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('⏳ Models still loading. Wait 30-60s.'); return; } if (!r.ok) throw new Error(await r.text()); lastResult = await r.json(); renderResults(lastResult); } catch (e) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('❌ ' + e.message); } }
+
+        function renderResults(d) {
+            hideSpinner(); document.getElementById('analyzeBtn').disabled = false; const b = document.getElementById('consensusBadge'); if (d.consensus) { b.className = 'consensus-badge agree'; b.textContent = '✅ Models Agree'; } else { b.className = 'consensus-badge disagree'; b.textContent = '⚠️ Disagree'; }
+            document.getElementById('kerasName').textContent = fmt(d.keras.name); document.getElementById('kerasBar').style.width = (d.keras.confidence * 100).toFixed(1) + '%'; document.getElementById('kerasConf').textContent = (d.keras.confidence * 100).toFixed(1) + '%'; document.getElementById('kerasLatency').textContent = d.keras.latency_ms.toFixed(1) + ' ms';
+            document.getElementById('torchName').textContent = fmt(d.pytorch.name); document.getElementById('torchBar').style.width = (d.pytorch.confidence * 100).toFixed(1) + '%'; document.getElementById('torchConf').textContent = (d.pytorch.confidence * 100).toFixed(1) + '%'; document.getElementById('torchLatency').textContent = d.pytorch.latency_ms.toFixed(1) + ' ms';
+            const te = document.getElementById('detailsTabs'), ce = document.getElementById('detailsContent'); te.innerHTML = ''; ce.innerHTML = '';
+            if (d.consensus) ce.innerHTML = renderDetailCard(d.pytorch.info || d.keras.info);
+            else { te.innerHTML = `<div class="tabs"><button class="tab-btn active" onclick="switchTab(0)">⚡ ${fmt(d.keras.name)}</button><button class="tab-btn" onclick="switchTab(1)">🎯 ${fmt(d.pytorch.name)}</button></div>`; ce.innerHTML = `<div id="tab0">${renderDetailCard(d.keras.info)}</div><div id="tab1" style="display:none">${renderDetailCard(d.pytorch.info)}</div>`; }
+            document.getElementById('resultsSection').classList.add('visible'); document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function switchTab(i) { document.querySelectorAll('.tab-btn').forEach((b, j) => b.classList.toggle('active', j === i)); document.getElementById('tab0').style.display = i === 0 ? 'block' : 'none'; document.getElementById('tab1').style.display = i === 1 ? 'block' : 'none'; }
+        function fmt(n) { return n ? n.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Unknown'; }
+
+        function renderDetailCard(info) {
+            if (!info) return '<div class="details-card" style="text-align:center;color:var(--muted);padding:36px;">No details available.</div>';
+            const t = info.Stage_Name || info.Disease_Name || info.Variety_Name || 'Result', cat = info.Category || '', desc = info.Description || '';
+            let bx = ''; if (info.Symptoms) bx += ib('blue', '⚠️ Symptoms', info.Symptoms); if (info.Characteristics) bx += ib('green', '✨ Characteristics', info.Characteristics); if (info.Treatment) bx += ib('orange', '💊 Treatment', info.Treatment); if (info.Growing_Conditions) bx += ib('purple', '☀️ Growing Conditions', info.Growing_Conditions);
+            let mg = info.MANAGEMENT_TIPS ? `<div class="mgmt-tip">💡 <strong>Tip:</strong> ${info.MANAGEMENT_TIPS}</div>` : '';
+            let im = ''; if (info.Images && info.Images.length) im = '<div class="imgs-row">' + info.Images.slice(0, 4).map(u => `<img src="${u}" class="ref-img" alt="Ref" onerror="this.style.display='none'">`).join('') + '</div>';
+            return `<div class="details-card"><div class="details-top"><div class="details-icon">🌿</div><div><div class="details-title">${t}</div><span class="details-category">${cat}</span></div></div><div class="details-desc">${desc}</div><div class="info-grid">${bx}</div>${mg}${im}</div>`;
+        }
+        function ib(c, l, t) { return `<div class="info-box ${c}"><h4>${l}</h4><p>${t}</p></div>`; }
+
+        /* CHAT */
+        function toggleChat() { chatOpen = !chatOpen; document.getElementById('chatWindow').classList.toggle('open', chatOpen); document.getElementById('chatFabBtn').textContent = chatOpen ? '✕' : '💬'; if (chatOpen) document.getElementById('chatInput').focus(); }
+        function clearChat() { document.getElementById('chatMessages').innerHTML = `<div class="chat-welcome"><div class="chat-welcome-icon">👋</div><h4>Hello, Farmer!</h4><p>Ask about crop diseases, treatments, or tips.</p></div><div class="chat-chips" id="chatChips"><button class="chat-chip" onclick="sendSuggestion(this)">🛡️ How to treat Bacterial Blight?</button><button class="chat-chip" onclick="sendSuggestion(this)">🥭 Best Mango varieties for Gujarat?</button><button class="chat-chip" onclick="sendSuggestion(this)">💊 Organic remedies for Anthracnose</button><button class="chat-chip" onclick="sendSuggestion(this)">🍃 Pomegranate growth stages</button></div>`; }
+        function sendSuggestion(el) { const t = el.textContent.trim(); document.getElementById('chatChips')?.remove(); appendUserMsg(t); fetchBotReply(t); }
+        async function sendChat() { const i = document.getElementById('chatInput'); const m = i.value.trim(); if (!m) return; i.value = ''; document.getElementById('chatChips')?.remove(); appendUserMsg(m); fetchBotReply(m); }
+        function appendUserMsg(t) { const m = document.getElementById('chatMessages'); m.innerHTML += `<div class="msg user"><div class="msg-bubble">${escHtml(t)}</div></div>`; m.scrollTop = m.scrollHeight; }
+        async function fetchBotReply(t) { const m = document.getElementById('chatMessages'); const id = 't_' + Date.now(); m.innerHTML += `<div class="msg bot" id="${id}"><div class="msg-avatar">🌱</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`; m.scrollTop = m.scrollHeight; try { const r = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: t }) }); const d = await r.json(); document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble">${md(d.reply)}</div></div>`; } catch (e) { document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble" style="color:var(--red)">Couldn't connect. Try again.</div></div>`; } m.scrollTop = m.scrollHeight; }
+        function md(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/^[\*\-] (.+)$/gm, '<li>$1</li>').replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:16px;margin:6px 0">$1</ul>').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>'); }
+        function escHtml(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function showSpinner(m) { document.getElementById('spinnerText').textContent = m; document.getElementById('spinnerOverlay').classList.add('visible'); }
+        function hideSpinner() { document.getElementById('spinnerOverlay').classList.remove('visible'); }
+        let toastTm; function showToast(m) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:12px 22px;border-radius:12px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.25);max-width:90vw;text-align:center;'; document.body.appendChild(t); } t.textContent = m; t.style.display = 'block'; clearTimeout(toastTm); toastTm = setTimeout(() => t.style.display = 'none', 6000); }
+    </script>
+</body>
+
+</html>
