@@ -1339,10 +1339,19 @@
     </div>
 
     <script>
+        const isGitHubPages = window.location.hostname.includes('github.io');
         const API = ''; let currentFile = null, lastResult = null, chatOpen = false;
-        function updateModelBadge(s) { const d = document.getElementById('modelDot'), t = document.getElementById('modelStatusText'); d.className = 'model-dot'; if (s === 'loaded') { d.classList.add('ready'); t.textContent = 'Models Ready'; } else if (s === 'loading') { d.classList.add('loading'); t.textContent = 'Loading…'; } else if (s.startsWith('error')) { d.classList.add('error'); t.textContent = 'Error'; } else t.textContent = 'AI Models'; }
-        async function pollModelStatus() { try { const r = await fetch(API + '/api/model-status'); const d = await r.json(); updateModelBadge(d.status); if (d.status !== 'loaded' && !d.status.startsWith('error')) setTimeout(pollModelStatus, 2000); } catch (e) { setTimeout(pollModelStatus, 3000); } }
-        async function kickLoadModels() { try { await fetch(API + '/api/load-models', { method: 'POST' }); } catch (e) { } pollModelStatus(); }
+
+        function updateModelBadge(s) { const d = document.getElementById('modelDot'), t = document.getElementById('modelStatusText'); d.className = 'model-dot'; if (s === 'loaded') { d.classList.add('ready'); t.textContent = 'Models Ready'; } else if (s === 'loading') { d.classList.add('loading'); t.textContent = 'Loading…'; } else if (s === 'demo') { d.style.background = '#f59e0b'; d.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.25)'; t.textContent = 'Demo Mode'; } else if (s.startsWith('error')) { d.classList.add('error'); t.textContent = 'Error'; } else t.textContent = 'AI Models'; }
+
+        async function pollModelStatus() {
+            if (isGitHubPages) { updateModelBadge('demo'); return; }
+            try { const r = await fetch(API + '/api/model-status'); const d = await r.json(); updateModelBadge(d.status); if (d.status !== 'loaded' && !d.status.startsWith('error')) setTimeout(pollModelStatus, 2000); } catch (e) { setTimeout(pollModelStatus, 3000); }
+        }
+        async function kickLoadModels() {
+            if (isGitHubPages) { updateModelBadge('demo'); return; }
+            try { await fetch(API + '/api/load-models', { method: 'POST' }); } catch (e) { } pollModelStatus();
+        }
         kickLoadModels();
 
         const dropZone = document.getElementById('dropZone'), fileInput = document.getElementById('fileInput');
@@ -1354,7 +1363,15 @@
         function handleFile(f) { if (!f.type.match(/image\/(jpeg|jpg|png)/)) { alert('Upload JPG or PNG.'); return; } currentFile = f; const r = new FileReader(); r.onload = e => { document.getElementById('previewImg').src = e.target.result; document.getElementById('previewFileName').textContent = f.name; document.getElementById('previewFileSize').textContent = (f.size / 1024).toFixed(1) + ' KB'; document.getElementById('previewSection').classList.add('visible'); document.getElementById('resultsSection').classList.remove('visible'); document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth', block: 'center' }); }; r.readAsDataURL(f); }
         function resetAll() { currentFile = null; lastResult = null; fileInput.value = ''; document.getElementById('previewSection').classList.remove('visible'); document.getElementById('resultsSection').classList.remove('visible'); document.getElementById('upload').scrollIntoView({ behavior: 'smooth' }); }
 
-        async function analyzeImage() { if (!currentFile) return; showSpinner('Analyzing…'); document.getElementById('analyzeBtn').disabled = true; const fd = new FormData(); fd.append('file', currentFile); try { const r = await fetch(API + '/api/analyze', { method: 'POST', body: fd }); if (r.status === 503) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('⏳ Models still loading. Wait 30-60s.'); return; } if (!r.ok) throw new Error(await r.text()); lastResult = await r.json(); renderResults(lastResult); } catch (e) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('❌ ' + e.message); } }
+        function showDemoAlert() {
+            showToast('🖥️ This is a UI demo. To run AI analysis, clone the repo and run: python app.py');
+        }
+
+        async function analyzeImage() {
+            if (!currentFile) return;
+            if (isGitHubPages) { showDemoAlert(); return; }
+            showSpinner('Analyzing…'); document.getElementById('analyzeBtn').disabled = true; const fd = new FormData(); fd.append('file', currentFile); try { const r = await fetch(API + '/api/analyze', { method: 'POST', body: fd }); if (r.status === 503) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('⏳ Models still loading. Wait 30-60s.'); return; } if (!r.ok) throw new Error(await r.text()); lastResult = await r.json(); renderResults(lastResult); } catch (e) { hideSpinner(); document.getElementById('analyzeBtn').disabled = false; showToast('❌ ' + e.message); }
+        }
 
         function renderResults(d) {
             hideSpinner(); document.getElementById('analyzeBtn').disabled = false; const b = document.getElementById('consensusBadge'); if (d.consensus) { b.className = 'consensus-badge agree'; b.textContent = '✅ Models Agree'; } else { b.className = 'consensus-badge disagree'; b.textContent = '⚠️ Disagree'; }
@@ -1385,7 +1402,14 @@
         function sendSuggestion(el) { const t = el.textContent.trim(); document.getElementById('chatChips')?.remove(); appendUserMsg(t); fetchBotReply(t); }
         async function sendChat() { const i = document.getElementById('chatInput'); const m = i.value.trim(); if (!m) return; i.value = ''; document.getElementById('chatChips')?.remove(); appendUserMsg(m); fetchBotReply(m); }
         function appendUserMsg(t) { const m = document.getElementById('chatMessages'); m.innerHTML += `<div class="msg user"><div class="msg-bubble">${escHtml(t)}</div></div>`; m.scrollTop = m.scrollHeight; }
-        async function fetchBotReply(t) { const m = document.getElementById('chatMessages'); const id = 't_' + Date.now(); m.innerHTML += `<div class="msg bot" id="${id}"><div class="msg-avatar">🌱</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`; m.scrollTop = m.scrollHeight; try { const r = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: t }) }); const d = await r.json(); document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble">${md(d.reply)}</div></div>`; } catch (e) { document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble" style="color:var(--red)">Couldn't connect. Try again.</div></div>`; } m.scrollTop = m.scrollHeight; }
+        async function fetchBotReply(t) {
+            const m = document.getElementById('chatMessages'); const id = 't_' + Date.now();
+            if (isGitHubPages) {
+                m.innerHTML += `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble">This is a <strong>demo version</strong> hosted on GitHub Pages. The AI chatbot requires the backend server.<br><br>To use the full AI features, clone the repo and run:<br><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:0.8rem;">python app.py</code></div></div>`;
+                m.scrollTop = m.scrollHeight; return;
+            }
+            m.innerHTML += `<div class="msg bot" id="${id}"><div class="msg-avatar">🌱</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`; m.scrollTop = m.scrollHeight; try { const r = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: t }) }); const d = await r.json(); document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble">${md(d.reply)}</div></div>`; } catch (e) { document.getElementById(id).outerHTML = `<div class="msg bot"><div class="msg-avatar">🌱</div><div class="msg-bubble" style="color:var(--red)">Couldn't connect. Try again.</div></div>`; } m.scrollTop = m.scrollHeight;
+        }
         function md(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/^[\*\-] (.+)$/gm, '<li>$1</li>').replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:16px;margin:6px 0">$1</ul>').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>'); }
         function escHtml(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
         function showSpinner(m) { document.getElementById('spinnerText').textContent = m; document.getElementById('spinnerOverlay').classList.add('visible'); }
