@@ -425,7 +425,7 @@ streamlit run main.py
 ## 👨‍💻 Author
 
 **Kurapati Raghavendra**  
-📧 veeraraghavendra.k22@iiits.in  
+📧 kurapatiraghavendra@gmail.com
 🔗 [LinkedIn](https://www.linkedin.com/in/kurapati-raghavendra-39b3951b0/) · [GitHub](https://github.com/raghavendrak04)
 
 ---
